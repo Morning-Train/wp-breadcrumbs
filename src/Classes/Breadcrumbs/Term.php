@@ -70,27 +70,41 @@ class Term {
             return null;
         }
 
-        $taxonomies = get_the_taxonomies($post);
+        $taxonomies = get_post_taxonomies($post);
 
-        if(empty($taxonomies) || count($taxonomies) !== 1) {
+		$taxonomies = array_filter($taxonomies, function ($taxonomy) {
+			$taxonomy = get_taxonomy($taxonomy);
+
+			if(empty($taxonomy)) {
+				return false;
+			}
+
+			return $taxonomy->public;
+		});
+
+        if(empty($taxonomies)) {
             return null;
         }
 
-        $taxonomy = array_keys($taxonomies)[0];
+        $taxonomy = array_values($taxonomies)[0];
 
         $term = null;
 
         if(function_exists('yoast_get_primary_term')) {
-            $term = get_term(yoast_get_primary_term($taxonomy, $post));
-        }
+			$termId = yoast_get_primary_term_id($taxonomy, $post);
 
-        if(!empty($term)) {
-            return $term;
+			if(!empty($termId)) {
+				$term = get_term($termId);
+
+				if(!empty($term)) {
+					return $term;
+				}
+			}
         }
 
         $terms = get_the_terms($post, $taxonomy);
 
-        if(!empty($terms) && count($terms) === 1) {
+        if(!empty($terms)) {
             return array_values($terms)[0];
         }
 
