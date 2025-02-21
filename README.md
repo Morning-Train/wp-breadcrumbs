@@ -57,6 +57,20 @@ You can remove the prefixed front page breadcrumb on all pages by calling `hideP
 \Morningtrain\WP\Breadcrumbs\Breadcrumbs::compose()->hidePrefixedFrontPagePart()->render();
 ```
 
+### Exclude terms
+You can easily hide the terms from the breadcrumbs by using `excludedTaxonomies` on the BreadcrumbGenerator.
+
+```php
+\Morningtrain\WP\Breadcrumbs\Breadcrumbs::compose()->excludedTaxonomies('category')->render();
+```
+
+### Exclude post type archive
+You can easily hide the post type archive from the breadcrumbs by using `excludedPostTypeArchives` on the BreadcrumbGenerator.
+
+```php
+\Morningtrain\WP\Breadcrumbs\Breadcrumbs::compose()->excludedPostTypeArchives('post')->render();
+```
+
 ### Alternative to Render
 If you will create your own markup, you can get all breadcrumb parts by calling `getBreadcrumbs` on the BreadcrumbGenerator.
 

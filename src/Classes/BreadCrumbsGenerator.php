@@ -13,6 +13,32 @@ class BreadCrumbsGenerator {
     protected string $separator = ' > ';
     protected bool $prefixWithFrontPage = true;
     protected bool $hideOnFrontPage = false;
+    protected array $excludedTaxonomies = [];
+    protected array $excludedPostTypeArchives = [];
+
+    /**
+     * Set taxonomies to exclude from breadcrumbs
+     * @param array $taxonomies Array of taxonomy names to exclude
+     * @return $this
+     */
+    public function excludeTaxonomies(array $taxonomies): static
+    {
+        $this->excludedTaxonomies = $taxonomies;
+
+        return $this;
+    }
+
+    /**
+     * Set post type archives to exclude from breadcrumbs
+     * @param array $postTypes Array of post type names to exclude archives for
+     * @return $this
+     */
+    public function excludePostTypeArchives(array $postTypes): static
+    {
+        $this->excludedPostTypeArchives = $postTypes;
+
+        return $this;
+    }
 
     /**
      * Set separator between each breadcrumb
@@ -86,13 +112,13 @@ class BreadCrumbsGenerator {
             return $parts;
         }
 
-        $archive = Archive::getBreadcrumb();
+        $archive = Archive::getBreadcrumb(null, $this->excludedPostTypeArchives);
 
         if(!empty($archive)) {
             $parts[] = $archive;
         }
 
-        $parts = array_merge($parts, Term::getBreadcrumbs());
+        $parts = array_merge($parts, Term::getBreadcrumbs(null, $this->excludedTaxonomies));
 
         if(is_archive()) {
             return $parts;

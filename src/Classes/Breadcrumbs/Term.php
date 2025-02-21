@@ -9,20 +9,23 @@ class Term {
      * @param WP_Term|null $term
      * @return BreadCrumb[]
      */
-    public static function getBreadcrumbs(?WP_Term $term = null) : array
+    public static function getBreadcrumbs(?WP_Term $term = null, array $excludedTaxonomies = []): array
     {
         $currentTerm = get_queried_object();
 
         if(empty($term)) {
-            $term = static::getTerm();
+            $term = static::getTerm($excludedTaxonomies);
 
             if(empty($term)) {
                 return [];
             }
         }
 
-        $parts = static::getAncestorParts($term);
+        if (in_array($term->taxonomy, $excludedTaxonomies)) {
+            return [];
+        }
 
+        $parts = static::getAncestorParts($term);
         $parts[] = static::getBreadcrumb($term, $term === $currentTerm);
 
         return $parts;
@@ -52,7 +55,7 @@ class Term {
         );
     }
 
-    protected static function getTerm() : ?WP_Term
+    protected static function getTerm(array $excludedTaxonomies = []) : ?WP_Term
     {
         $currentTerm = get_queried_object();
 
@@ -81,6 +84,10 @@ class Term {
 
 			return $taxonomy->public;
 		});
+
+        $taxonomies = array_filter($taxonomies, function ($taxonomy) use ($excludedTaxonomies) {
+            return !in_array($taxonomy, $excludedTaxonomies);
+        });
 
         if(empty($taxonomies)) {
             return null;
