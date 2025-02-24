@@ -5,7 +5,7 @@ use WP_Post_Type;
 
 class Archive {
 
-    public static function getBreadcrumb(WP_Post_Type $postType = null) : ?BreadCrumb
+    public static function getBreadcrumb(WP_Post_Type $postType = null, array $excludedPostTypeArchives = []) : ?BreadCrumb
     {
         if(empty($postType)) {
             $postType = static::getPostType();
@@ -13,6 +13,10 @@ class Archive {
             if(empty($postType)) {
                 return null;
             }
+        }
+
+        if (in_array($postType, $excludedPostTypeArchives)) {
+            return null;
         }
 
         $postTypeObject = get_post_type_object($postType);
